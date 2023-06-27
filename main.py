@@ -16,13 +16,14 @@ D = ((0, 3, 1, 3, inf, inf),
      (inf, inf, 7, inf, 0, 4),
      (inf, inf, 5, 2, 4, 0))
 
-startV = 0
+start = 0
+end = 5
 LENGTH_D = len(D)
 LENGTH_CHROM = len(D)*len(D[0])
 POPULATION_SIZE = 1000
 P_CROSSOVER = 0.9
 P_MUTATION = 0.1
-MAX_GENERATIONS = 10
+MAX_GENERATIONS = 30
 HALL_OF_FAME_SIZE = 1
 
 hof = tools.HallOfFame(HALL_OF_FAME_SIZE)
@@ -46,7 +47,7 @@ def dikstryFitness(individual):
     for n, path in enumerate(individual):
         path = path[:path.index(n)+1]
 
-        si = startV
+        si = start
         for j in path:
             s += D[si][j]
             si = j
@@ -86,9 +87,6 @@ population, logbook = algorithms.eaSimple(population, toolbox,
 
 minFitnessValues, meanFitnessValues, maxFitnessValues = logbook.select("min", "avg", "max")
 
-best = hof.items[0]
-print(best)
-
 plt.plot(maxFitnessValues, color='red', label='Maximum')
 plt.plot(meanFitnessValues, color='green', label='Average')
 plt.plot(minFitnessValues, color='blue', label='Minimum')
@@ -97,5 +95,6 @@ plt.ylabel('Max/Average/Min')
 plt.title('Values of each generations')
 plt.legend(loc="lower right")
 fig, ax = plt.subplots()
-show_graph(ax, best)
+best = hof.items[0]
+show_graph(ax, best, start, end)
 plt.show()

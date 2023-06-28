@@ -54,7 +54,6 @@ def evaluate_fitness(individual):
 
     return distance,
 
-
 toolbox.register("evaluate", evaluate_fitness)
 toolbox.register("mate", tools.cxPartialyMatched)
 toolbox.register("mutate", tools.mutShuffleIndexes, indpb=0.05)

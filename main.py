@@ -3,12 +3,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
 from deap import base, creator, tools, algorithms
+from statistics import mean
 
 # Deap's parameters
 POPULATION_SIZE = 1000
-NUM_GENERATIONS = 50
+NUM_GENERATIONS = 75
 CROSSOVER_PROB = 0.9
-MUTATION_PROB = 0.1
+MUTATION_PROB = 0.001
 
 #Task's parameters
 NUM_POINTS = 10
@@ -30,13 +31,6 @@ connections = {
     8: [7],
     9: [6, 7]
 }
-
-# Create the graph for points and connections between them
-G = nx.Graph()
-G.add_nodes_from(range(NUM_POINTS))
-for point, connected_points in connections.items():
-    for connected_point in connected_points:
-        G.add_edge(point, connected_point)
 
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 creator.create("Individual", list, fitness=creator.FitnessMin)
@@ -96,12 +90,13 @@ for generation in range(NUM_GENERATIONS):
 
 best_individual = hof[0]
 best_fitness = evaluate_fitness(best_individual)[0]
-print("Best Individual:", best_individual)
-print("Best Fitness:", best_fitness)
+print("Best Connections:", best_individual)
+print("Best Fintess:", best_fitness)
 fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(18, 6))
 min_fitness_values = logbook.select("min")
 avg_fitness_values = logbook.select("avg")
 max_fitness_values = logbook.select("max")
+print(f"Min: {round(min(min_fitness_values))} Avg: {round(mean(avg_fitness_values))} Max: {round(max(max_fitness_values))} ")
 
 # Pops' stats, graph 1
 ax1.plot(min_fitness_values, color="blue", label="Min")
@@ -112,6 +107,13 @@ ax1.set_ylabel("Fitness")
 ax1.legend(loc="best")
 ax1.set_title("Evolution of Fitness")
 ax1.grid(True)
+
+# Create the graph for points and connections between them
+G = nx.Graph()
+G.add_nodes_from(range(NUM_POINTS))
+for point, connected_points in connections.items():
+    for connected_point in connected_points:
+        G.add_edge(point, connected_point)
 
 # Best individual's route
 G_best = nx.Graph()
@@ -127,7 +129,6 @@ nx.draw_networkx_labels(G_best, pos=pos, font_color="black", ax=ax2)
 edges = G.edges
 nx.draw_networkx_edges(G, pos=pos, edgelist=edges, edge_color="black", ax=ax2)
 
-
 # Shortest path in red + connections between the points, graph 3
 pos = {i: point_coordinates[i] for i in range(NUM_POINTS)}
 nx.draw_networkx_nodes(G_best, pos=pos, ax=ax3)
@@ -136,10 +137,9 @@ edges = G.edges
 nx.draw_networkx_edges(G, pos=pos, edgelist=edges, edge_color="black", ax=ax3)
 shortest_path = best_individual
 shortest_path_edges = [(shortest_path[i], shortest_path[i + 1]) for i in range(len(shortest_path) - 1)]
-print(f'shpe: {shortest_path_edges}')
 nx.draw_networkx_edges(G_best, pos=pos, edgelist=shortest_path_edges, edge_color="red", ax=ax3)
 
-ax2.set_title("Connection sheme")
-ax3.set_title("Best Individual's Route")
+ax2.set_title("Connections sheme")
+ax3.set_title("Best Route")
 plt.tight_layout()
 plt.show()
